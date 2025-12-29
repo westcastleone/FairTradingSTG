@@ -81,14 +81,33 @@ plt.title('Log Prices of Gold and Silver Futures')
 plt.legend()
 plt.grid(True)
 
-# 하단: TLS 스프레드 (이게 평균으로 회귀해야 함)
+# 하단: TLS 스프레드 및 추세선
 plt.subplot(2, 1, 2)
-plt.plot(data['Spread_TLS'], color='green', label=f'TLS Spread (Beta={beta_tls:.2f})')
-plt.axhline(0, color='red', linestyle='--', label='Mean (0)')
+
+# 1) 스프레드 그리기
+plt.plot(data.index, data['Spread_TLS'], color='green', label=f'TLS Spread (Beta={beta_tls:.2f})', alpha=0.6)
+
+# ---------------- [추가된 부분 시작] ----------------
+# 2) 추세선 계산 (np.polyfit 사용)
+# x축을 숫자(0, 1, 2...)로 변환하여 회귀분석 수행
+x_idx = np.arange(len(data))
+y_spread = data['Spread_TLS'].values
+
+# 1차원(직선) 회귀식 도출 (z[0]: 기울기, z[1]: 절편)
+z = np.polyfit(x_idx, y_spread, 1) 
+p = np.poly1d(z) # 추세선 함수 생성
+
+# 3) 추세선 그리기
+# 기울기(Trend Slope)가 0에 가까울수록 좋습니다.
+plt.plot(data.index, p(x_idx), color='orange', linestyle='--', linewidth=2, label=f'Linear Trend (Slope={z[0]:.2e})')
+# ---------------- [추가된 부분 끝] ----------------
+
+plt.axhline(0, color='red', linestyle='-', alpha=0.5, label='Mean (0)')
 plt.axhline(data['Spread_TLS'].std()*2, color='gray', linestyle=':', label='+2 Sigma')
 plt.axhline(-data['Spread_TLS'].std()*2, color='gray', linestyle=':', label='-2 Sigma')
-plt.title('Cointegration Spread based on TLS')
-plt.legend()
+
+plt.title('Cointegration Spread based on TLS with Trendline')
+plt.legend(loc='upper left') # 범례 위치 조정
 plt.grid(True)
 
 plt.tight_layout()
