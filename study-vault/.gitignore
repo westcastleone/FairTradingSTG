@@ -1,5 +1,0 @@
-# 원본 대화 내보내기는 개인정보가 많아 커밋하지 않음
-0-Inbox/import/*
-!0-Inbox/import/.gitkeep
-.obsidian/workspace*.json
-.DS_Store
